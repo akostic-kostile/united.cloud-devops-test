@@ -18,6 +18,8 @@ Each of these tasks should be done on a separate branch and later merged into ma
 
 ## Solutions:
 
+1. Take a look at README.md in `ansible` directory.
+
 4. I decided to expand the questions just a little bit and add some recommendations about storage and filesystem as well as these are also pretty important while talking about a resilient infrastructure. 
     1. ### Storage
         Obviously we're running some sort of storage array and it's configured to use [RAID 10](https://www.diffen.com/difference/RAID-5-vs-RAID-10) (stripe of mirrors) and not [RAID 5](https://www.diffen.com/difference/RAID-5-vs-RAID-10) (uses parity disks) as RAID 5 has proven quite unreliable in enterprise environment. Losing 1 disk in RAID 5 would put so much pressure on remaining disks that it wasn't uncommon for more disks to die, leading to collapse of RAID array and data loss.

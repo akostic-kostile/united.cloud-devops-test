@@ -1,0 +1,35 @@
+---
+- name: Increase open files limit on Ubuntu 22.04 LTS x64
+  hosts: server1
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Ensure the OS is Ubuntu 22.04
+      assert:
+        that:
+          - ansible_facts['distribution'] == 'Ubuntu'
+          - ansible_facts['distribution_version'] == '22.04'
+          - ansible_facts['architecture'] == 'x86_64'
+        fail_msg: "This playbook can only be run on Ubuntu 22.04 LTS x64"
+
+    - name: Set the soft open files limit in PAM
+      community.general.pam_limits:
+        domain: app
+        limit_type: soft
+        limit_item: nofile
+        value: 262144
+
+    - name: Set the hard open files limit in PAM
+      community.general.pam_limits:
+        domain: app
+        limit_type: hard
+        limit_item: nofile
+        value: 262144
+
+    # - name: Set the maximum number of open file descriptors
+    #   ansible.builtin.sysctl:
+    #     name: fs.file-max
+    #     value: '9223372036854775807'
+    #     state: present
+    #     sysctl_set: yes
+    #     reload: yes

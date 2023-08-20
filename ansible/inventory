@@ -1,0 +1,2 @@
+localhost ansible_connection=local
+server1 ansible_user=$USER ansible_host=$HOST
