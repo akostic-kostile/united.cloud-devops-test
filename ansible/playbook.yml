@@ -1,5 +1,5 @@
 ---
-- name: Increase open files limit on Ubuntu 22.04 LTS x64
+- name: Increase open files limit for nginx service on Ubuntu 22.04 LTS x64
   hosts: server1
   gather_facts: true
   become: true
@@ -12,19 +12,35 @@
           - ansible_facts['architecture'] == 'x86_64'
         fail_msg: "This playbook can only be run on Ubuntu 22.04 LTS x64"
 
-    - name: Set the soft open files limit in PAM
-      community.general.pam_limits:
-        domain: app
-        limit_type: soft
-        limit_item: nofile
-        value: 262144
+    - name: Ensure nginx is installed
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: yes
 
-    - name: Set the hard open files limit in PAM
-      community.general.pam_limits:
-        domain: app
-        limit_type: hard
-        limit_item: nofile
-        value: 262144
+    - name: Create systemd override directory for nginx
+      ansible.builtin.file:
+        path: /etc/systemd/system/nginx.service.d
+        state: directory
+
+    - name: Increase nginx open files limit
+      copy:
+        dest: /etc/systemd/system/nginx.service.d/override.conf
+        content: |
+          [Service]
+          LimitNOFILE=524288
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd to apply changes
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Restart nginx to apply the new open files limit
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
 
     # - name: Set the maximum number of open file descriptors
     #   ansible.builtin.sysctl:
