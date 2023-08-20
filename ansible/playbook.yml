@@ -4,7 +4,7 @@
   gather_facts: true
   become: true
   tasks:
-    - name: Ensure the OS is Ubuntu 22.04
+    - name: Ensure the OS is Ubuntu 22.04 LTS x64
       assert:
         that:
           - ansible_facts['distribution'] == 'Ubuntu'
