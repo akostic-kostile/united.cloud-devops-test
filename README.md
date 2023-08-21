@@ -18,7 +18,11 @@ Each of these tasks should be done on a separate branch and later merged into ma
 
 ## Solutions:
 
-1. Take a look at README.md in `ansible` directory.
+1. Take a look at README.md in [ansible](ansible) directory.
+
+2. Take a look at README.md in [python](python) directory.
+
+3. Take a look at README.md in [python](python) directory.
 
 4. I decided to expand the questions just a little bit and add some recommendations about storage and filesystem as well as these are also pretty important while talking about a resilient infrastructure. 
     1. ### Storage
