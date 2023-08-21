@@ -1,4 +1,9 @@
-## Notes:
+## Question:
+
+1. If we assume running some of the services causes "Too many open files" errors in logs write Ansible (preferred) or Puppet or Chef "playbook" which sets this limit to the higher value.
+
+## Solution:
+### Notes:
 
 - Playbook is only runnable against Ubuntu 22.04 LTS x64
 
@@ -12,7 +17,7 @@
         **Relevant property is `LimitNOFILE=` under `[Service]`.**
 
 
-## How to use it:
+### How to use it:
 1. Playbook assumes that we are increasing number of open files for Nginx service (and makes sure Nginx is installed in the first place).
 2. Edit inventory file by replacing `$USER` and `$HOST` with SSH user and hostname (or ip) respectively.
 3. Execute the following command:
