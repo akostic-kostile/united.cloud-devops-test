@@ -1,10 +1,19 @@
-import requests
-import sqlite3
+"""
+datatime needed for current time.
+sqlite3 as DB.
+time for time.sleep().
+requests for doing HTTP GET requests.
+"""
 from datetime import datetime
+import sqlite3
 import time
+import requests
 
 
 def create_table():
+    """
+    Creates a table that will be used for storing geoip data.
+    """
     conn = sqlite3.connect("db/geoip.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -36,16 +45,20 @@ def create_table():
                        currencyConverter REAL)"""
     )
     conn.commit()
-    print("Successfully created geoip_info table.")
     conn.close()
 
 
 def fetch_geoip_info():
+    """
+    First get public IP from https://api.ipify.org .
+    Then get geoip data from http://www.geoplugin.net/json.gp?ip= .
+    """
     try:
-        public_ip = requests.get("https://api.ipify.org")
+        public_ip = requests.get("https://api.ipify.org", timeout=5)
         public_ip.raise_for_status()
         response = requests.get(
-            "http://www.geoplugin.net/json.gp?ip={ public_ip.content.decode('utf8') }"
+            "http://www.geoplugin.net/json.gp?ip={ public_ip.content.decode('utf8') }",
+            timeout=5,
         )
         response.raise_for_status()
         return response.json()
@@ -55,6 +68,9 @@ def fetch_geoip_info():
 
 
 def store_geoip_info(geoip_info):
+    """
+    Connect to DB and INSERT all data from geoip.
+    """
     conn = sqlite3.connect("db/geoip.db")
     cursor = conn.cursor()
     timestamp = datetime.now().isoformat()
@@ -63,9 +79,17 @@ def store_geoip_info(geoip_info):
                         timestamp, ip, status, delay, credit,
                         city, region, regionCode, regionName, areaCode,
                         dmaCode, countryCode, countryName,  inEU, euVATrate,
-                        continentCode, continentName, latitude, longitude, locationAccuracyRadius,
-                        timezone, currencyCode, currencySymbol, currencySymbol_UTF8, currencyConverter
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                        continentCode, continentName, latitude, longitude,
+                        locationAccuracyRadius, timezone, currencyCode, currencySymbol,
+                        currencySymbol_UTF8, currencyConverter
+                        ) VALUES (
+                            ?, ?, ?, ?, ?,
+                            ?, ?, ?, ?, ?,
+                            ?, ?, ?, ?, ?,
+                            ?, ?, ?, ?,
+                            ?, ?, ?, ?,
+                            ?, ?
+                        )""",
         (
             timestamp,
             geoip_info["geoplugin_request"],
@@ -100,6 +124,10 @@ def store_geoip_info(geoip_info):
 
 
 def main():
+    """
+    Create table if needed.
+    Query geoip DB every 60 sec for new data.
+    """
     create_table()
     while True:
         geoip_info = fetch_geoip_info()
